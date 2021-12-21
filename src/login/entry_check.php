@@ -94,9 +94,9 @@ session_regenerate_id(true);
             ?>
 
                 <form method="post" action="entry_done.php">
-                    <input type="hidden" name="email" value="' . $email . '">
-                    <input type="hidden" name="pass" value="' . $pass . '">
-                    <input type="hidden" name="name" value="' . $name . '">
+                    <input type="hidden" name="email" value=<?= $email ?>>
+                    <input type="hidden" name="pass" value=<?= $pass ?>>
+                    <input type="hidden" name="name" value=<?= $name ?>>
                     <br>
                     <h2>名前：<br>「<?= $name ?>」さん</h2>
                     <br>

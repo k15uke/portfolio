@@ -1049,3 +1049,19 @@ header {
 	text-align: center;
 	margin-left : -10rem;
 }
+
+
+.containerS button{
+	text-align: right;
+	margin-left:6rem;
+}
+
+.containerS submit{
+	text-align: right;
+	margin-left: 10rem;
+}
+
+.card-body{
+	background-color: black;
+	color: white;
+}

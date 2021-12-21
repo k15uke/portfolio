@@ -59,7 +59,7 @@ session_regenerate_id(true);
     <section class="conA">
         <div class="container">
             <?php if (isset($_SESSION['msg']['err'])) : ?>
-                <div class="col-sm-6 alert alert-danger alert-dismissible fade show">
+                <div class="alert alert-danger alert-dismissible fade show">
                     <?= $_SESSION['msg']['err'] ?>
                     <?php unset($_SESSION['msg']['err']); ?>
                 </div>

@@ -60,12 +60,11 @@ session_regenerate_id(true);
         <section class="conA">
             <div class="container">
                 <?php if (isset($_SESSION['msg']['err'])) : ?>
-                    <div class="col-sm-6 alert alert-danger alert-dismissible fade show">
+                    <div class="alert alert-danger alert-dismissible fade show">
                         <?= $_SESSION['msg']['err'] ?>
                         <?php unset($_SESSION['msg']['err']); ?>
                     </div>
                 <?php endif ?>
-
                 <h1>Urattei</h1>
                 <p>Twitterでは書けないことを書く匿名会員制サイト</p>
                 <a href="./login/entry.php">Let's start</a>
@@ -81,7 +80,7 @@ session_regenerate_id(true);
                     <p>Uratteiでは、ルールは一切ありません。煮るなり焼くなり好きにしてください。
                     </p>
                     <a href="#">Let's Join</a>
-                        <span class="fa fa-chevron-right"></span>
+                    <span class="fa fa-chevron-right"></span>
                     </a>
                 </div>
             </div>
@@ -90,18 +89,35 @@ session_regenerate_id(true);
     <?php endif ?>
     <?php if (isset($_SESSION['login'])) : ?>
         <section class="conA">
-            <div class="container">
-                <img src="img/logo.svg" alt="">
-                <h1>ログイン成功</h1>
-                <a href="./login/logout.php">ログアウト</a>
-
+            <div class="containerS">
+                <textarea class="" style="width:400px" ;></textarea>
+                <br>
+                <button type="button" onclick="location.href='../index.php'" class="btn btn-dark">画像を添付</button>
+                <button type="submit" class="btn btn-dark">投稿</button>
+                <br><br>
+                <div class="card mb-3" style="max-width: 540px;">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="./img/top.img">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">Card title</h5>
+                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+        </section>
+        <section class="conB">
+
+        </section>
+        </div>
         </section>
     <?php endif ?>
-    </section>
-
-    <section class="conD">
-    </section>
     <footer>
         <div class="footC">
             &copy 底剋山商会. All rights reserved.
