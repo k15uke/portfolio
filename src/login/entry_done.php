@@ -15,17 +15,19 @@ session_regenerate_id(true);
 <?php
         try{
             $name = $_POST['name'];
+            $email = $_POST['email'];
             $pass = $_POST['pass'];
             $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
             $user = 'root';
-            $password='';
+            $password='root';
            
             $dbh = new PDO($dsn,$user,$password);
             $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
-            $sql = 'INSERT INTO users(name,pass) VALUES(?,?)';
+            $sql = 'INSERT INTO users(name,email,pass) VALUES(?,?,?)';
             $stmt = $dbh->prepare($sql);
             $data[] = $name;
+            $data[] = $email;
             $data[] = $pass;
             $stmt->execute($data);
             
