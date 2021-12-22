@@ -2,6 +2,9 @@
 session_start();
 session_regenerate_id(true);
 
+$user = $_SESSION['user'];
+$introduce = $_SESSION['user'];
+
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +21,7 @@ session_regenerate_id(true);
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">U r a t t e i</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,21 +29,32 @@ session_regenerate_id(true);
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <?php if (!isset($_SESSION["login"])) : ?>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="./login/login.php">ログイン</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="./login/entry.php">会員登録</a>
+                        </li>
+                    <?php endif ?>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">トップページ</a>
+                        <a class="nav-link active" aria-current="page" href="./index.php">トップページ</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">プロフィール</a>
-                    </li>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./login/logout.php" tabindex="-1">ログアウト</a>
-                    </li>
+                    <?php if (isset($_SESSION["login"])) : ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./user-info.php">プロフィール</a>
+                        </li>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./login/logout.php" tabindex="-1">ログアウト</a>
+                        </li>
                 </ul>
                 <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
+            <?php endif ?>
+
             </div>
         </div>
     </nav>
@@ -64,32 +78,18 @@ session_regenerate_id(true);
 
     <?php endif ?>
     <?php if (isset($_SESSION['login'])) : ?>
-        <section class="conB">
-            <div class="container-1">
-                <form method="post" action="./post.php">
-                    <div class="container2">
-                        <br>
-                        <textarea style="width: 400px;background-color:black;color:white;"></textarea>
-                        <br>
-                    </div>
-                    <div class="d-flex gap-2 justify-content-end">
-                        <button class="btn btn-dark" type="button">画像を添付</button>
-                        <button class="btn btn-dark" type="submit">投稿</button>
-                    </div>
-                </form>
-            </div>
-        </section>
+
         <section class="conX">
             <div class="card bg-dark" style="max-width: 540px;">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <img src="./img/top.jpg" class="card-img-top" style="width:200px; height:170px">
+                        <img src="./img/top.jpg" class="card-img-top" style="width:12vh; height:12vh">
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                            <h5 class="card-title"><?= $user ?> さん</h5>
+                            <p class="card-text"><?= $introduce ?> よろしくお願いします</p>
+                            <p class="card-text"><small class="text-muted">2021.10.21にアカウント作成</small></p>
                         </div>
                     </div>
                 </div>

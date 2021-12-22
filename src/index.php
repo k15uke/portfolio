@@ -2,6 +2,11 @@
 session_start();
 session_regenerate_id(true);
 
+if(isset($_SESSION['login'])){
+$posts = $_SESSION['posts'];
+$name = $_SESSION['name'];
+$email = $_SESSION['email'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -26,31 +31,31 @@ session_regenerate_id(true);
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <?php if(!isset($_SESSION["login"])): ?>
+                    <?php if (!isset($_SESSION["login"])) : ?>
                         <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./login/login.php">ログイン</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./login/entry.php">会員登録</a>
-                    </li>
+                            <a class="nav-link active" aria-current="page" href="./login/login.php">ログイン</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="./login/entry.php">会員登録</a>
+                        </li>
                     <?php endif ?>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="./index.php">トップページ</a>
                     </li>
-                    <?php if(isset($_SESSION["login"])): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./user-info.php">プロフィール</a>
-                    </li>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./login/logout.php" tabindex="-1">ログアウト</a>
-                    </li>
+                    <?php if (isset($_SESSION["login"])) : ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./user-info.php">プロフィール</a>
+                        </li>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./login/logout.php" tabindex="-1">ログアウト</a>
+                        </li>
                 </ul>
                 <form class="d-flex">
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
-                <?php endif ?>
+            <?php endif ?>
 
             </div>
         </div>
@@ -75,12 +80,18 @@ session_regenerate_id(true);
 
     <?php endif ?>
     <?php if (isset($_SESSION['login'])) : ?>
-        <section class="conB">
+        <section class="conX">
             <div class="container-1">
+                <?php if (isset($_SESSION['msg']['err'])) : ?>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <?= $_SESSION['msg']['err'] ?>
+                        <?php unset($_SESSION['msg']['err']); ?>
+                    </div>
+                <?php endif ?>
                 <form method="post" action="./post.php">
                     <div class="container2">
-                        <br>
-                        <textarea style="width: 400px;background-color:black;color:white;"></textarea>
+                        <input type="hidden" name="email" value="<?= $_SESSION['email'] ?>">
+                        <textarea name="text" style="width:500px; height:60px;background-color:black;color:white;"></textarea>
                         <br>
                     </div>
                     <div class="d-flex gap-2 justify-content-end">
@@ -90,24 +101,26 @@ session_regenerate_id(true);
                 </form>
             </div>
         </section>
-        <section class="conX">
-            <div class="card bg-dark" style="max-width: 540px;">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <img src="./img/top.jpg" class="card-img-top" style="width:200px; height:170px">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">Card title</h5>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                            <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+        <?php foreach ((array)$posts as $post) : ?>
+            <section class="conX">
+                <div class="card bg-dark" style="max-width: 540px;">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <img src="./img/top.jpg" class="card-img-top" style="width:9vh; height:12vh">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title"><?= $_SESSION['user'] ?>さん</h5>
+                                <p class="card-text"><?= $name ?></p>
+                                <p class="card-text"><small class="text-muted">2021/12/18 20:54 </small></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        <?php endforeach ?>
         <section class="conA">
-            
+
         </section>
     <?php endif ?>
     <footer>
@@ -116,4 +129,5 @@ session_regenerate_id(true);
         </div>
     </footer>
 </body>
+
 </html>

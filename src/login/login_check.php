@@ -59,6 +59,7 @@ try{
         session_start();
         $_SESSION['login']=1;
         $_SESSION['name']=$rec['name'];
+        $_SESSION['email']=$rec['email'];
         header('Location: ../index.php');
         exit();
     }
