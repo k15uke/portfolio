@@ -88,35 +88,21 @@ session_regenerate_id(true);
         </section>
     <?php endif ?>
     <?php if (isset($_SESSION['login'])) : ?>
-        <section class="conA">
-            <div class="containerS">
-                <textarea class="" style="width:400px" ;></textarea>
-                <br>
-                <button type="button" onclick="location.href='../index.php'" class="btn btn-dark">画像を添付</button>
-                <button type="submit" class="btn btn-dark">投稿</button>
-                <br><br>
-                <div class="card mb-3" style="max-width: 540px;">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <img src="./img/top.img">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">Card title</h5>
-                                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </section>
         <section class="conB">
+            <div class="container-1">
+                <form method="post" action="./post.php">
+                    <div class="container2">
+                        <textarea style="width: 400px;background-color:black;color:white;"></textarea>
+                        <br>
+                    </div>
+                    <div class="d-flex gap-2 justify-content-end">
+                        <button class="btn btn-dark" type="button">画像を添付</button>
+                        <button class="btn btn-dark" type="submit">投稿</button>
+                    </div>
+                </form>
+            </div>
+        </section>
 
-        </section>
-        </div>
-        </section>
     <?php endif ?>
     <footer>
         <div class="footC">
