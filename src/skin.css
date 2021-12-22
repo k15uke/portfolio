@@ -186,6 +186,8 @@ body {
 }
 
 .conC {
+	position:absolute;
+	text-align:center;
 	background-color: #5D9AB2;
 	background-color: var(--main-color);
 	color: #fff;
@@ -1078,11 +1080,18 @@ header {
 	align-items: center;
 	justify-content: center;
 	background-color:black;
-	height: 100vh;
-	min-height: 450px;
+	height: 10vh;
+	min-height: 200px;
 	background-position: center;
 	background-size: cover;
 	color: #fff;
-	color: var(--text-bright-color);
 	text-align: center;
+}
+
+.card{
+	text-align: left;
+}
+
+.con1{
+	width: 50%;
 }

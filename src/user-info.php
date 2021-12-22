@@ -26,20 +26,11 @@ session_regenerate_id(true);
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <?php if(!isset($_SESSION["login"])): ?>
-                        <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./login/login.php">ログイン</a>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">トップページ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./login/entry.php">会員登録</a>
-                    </li>
-                    <?php endif ?>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="./index.php">トップページ</a>
-                    </li>
-                    <?php if(isset($_SESSION["login"])): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./user-info.php">プロフィール</a>
+                        <a class="nav-link" href="#">プロフィール</a>
                     </li>
                     </li>
                     <li class="nav-item">
@@ -50,8 +41,6 @@ session_regenerate_id(true);
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
-                <?php endif ?>
-
             </div>
         </div>
     </nav>
@@ -68,7 +57,7 @@ session_regenerate_id(true);
                 <p>Twitterでは書けないことを書く匿名会員制サイト</p>
                 <a href="./login/entry.php">Let's start</a>
                 <br>
-                <a href="./login/login.php">ログイン</a>
+                <a href="./login/entry.php">ログイン</a>
 
             </div>
         </section>
