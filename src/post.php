@@ -30,6 +30,7 @@ session_regenerate_id(true);
             $stmt->execute($data);
             
             $_SESSION['posts'] +=1;
+
             $_SESSION['msg']['err'] = '投稿しました';
             header('Location: ./index.php');
             exit;

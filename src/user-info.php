@@ -2,8 +2,7 @@
 session_start();
 session_regenerate_id(true);
 
-$user = $_SESSION['user'];
-$introduce = $_SESSION['user'];
+$user = $_SESSION['name'];
 
 ?>
 
@@ -21,9 +20,9 @@ $introduce = $_SESSION['user'];
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">U r a t t e i</a>
+            <a class="navbar-brand" href="./index.php">U r a t t e i</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -78,7 +77,20 @@ $introduce = $_SESSION['user'];
 
     <?php endif ?>
     <?php if (isset($_SESSION['login'])) : ?>
+        <?php try{
+                $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
+                $dbh = new PDO($dsn, 'root','root');
+                $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $sql = 'select * from users';
+                $stmt = $dbh->prepare($sql);
+                $stmt->execute();
+                $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+       }catch(Exception $e){
+           var_dump($e);
+           exit;
+       } ?>
+       <?php foreach($list as $v) ?>
         <section class="conX">
             <div class="card bg-dark" style="max-width: 540px;">
                 <div class="row g-3">
@@ -87,16 +99,16 @@ $introduce = $_SESSION['user'];
                     </div>
                     <div class="col-md-8">
                         <div class="card-body">
-                            <h5 class="card-title"><?= $user ?> さん</h5>
-                            <p class="card-text"><?= $introduce ?> よろしくお願いします</p>
-                            <p class="card-text"><small class="text-muted">2021.10.21にアカウント作成</small></p>
+                            <h5 class="card-title"><?= $v['name'] ?> さん</h5>
+                            <p class="card-text">投稿数<?= $v['posts'] ?> </p>
+                            <p class="card-text"><small class="text-muted"><?= $v['create_date'] ?><br>にアカウント作成</small></p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         <section class="conA">
-            
+
         </section>
     <?php endif ?>
     <footer>
@@ -105,4 +117,5 @@ $introduce = $_SESSION['user'];
         </div>
     </footer>
 </body>
+
 </html>

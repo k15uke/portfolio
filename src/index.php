@@ -2,10 +2,10 @@
 session_start();
 session_regenerate_id(true);
 
-if(isset($_SESSION['login'])){
-$posts = $_SESSION['posts'];
-$name = $_SESSION['name'];
-$email = $_SESSION['email'];
+if (isset($_SESSION['login'])) {
+    $name = $_SESSION['name'];
+    $email = $_SESSION['email'];
+    $posts = $_SESSION['posts'];
 }
 ?>
 
@@ -80,6 +80,34 @@ $email = $_SESSION['email'];
 
     <?php endif ?>
     <?php if (isset($_SESSION['login'])) : ?>
+        <?php try {
+            $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
+            $dbh = new PDO($dsn, 'root', 'root');
+            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = 'select * from posts order by posted desc';
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+            $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            var_dump($e);
+            exit;
+        }
+
+        ?>
+        <?php try {
+            $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
+            $dbh = new PDO($dsn, 'root', 'root');
+            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $sql = 'select * from users';
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+            $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            var_dump($e);
+            exit;
+        }
+
+        ?>
         <section class="conX">
             <div class="container-1">
                 <?php if (isset($_SESSION['msg']['err'])) : ?>
@@ -101,7 +129,9 @@ $email = $_SESSION['email'];
                 </form>
             </div>
         </section>
-        <?php foreach ((array)$posts as $post) : ?>
+
+        <?php foreach ($list as $v) : ?>
+            <?php foreach ($lists as $k) : ?>
             <section class="conX">
                 <div class="card bg-dark" style="max-width: 540px;">
                     <div class="row g-3">
@@ -110,18 +140,20 @@ $email = $_SESSION['email'];
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
-                                <h5 class="card-title"><?= $_SESSION['user'] ?>さん</h5>
-                                <p class="card-text"><?= $name ?></p>
-                                <p class="card-text"><small class="text-muted">2021/12/18 20:54 </small></p>
+                                <h5 class="card-title"><?= $k['name'] ?>さん</h5>
+                                <p class="card-text"><?= $v['text'] ?></p>
+                                <p class="card-text"><small class="text-muted"><?= $v['posted'] ?></small></p>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
         <?php endforeach ?>
+        <?php endforeach ?>
         <section class="conA">
 
         </section>
+
     <?php endif ?>
     <footer>
         <div class="footC">
