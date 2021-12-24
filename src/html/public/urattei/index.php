@@ -29,6 +29,7 @@ unset($_SESSION['msg']['error']);
 
 if (empty($_SESSION['user'])) {      // 未ログインのとき    
 ?>
+
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
@@ -73,102 +74,72 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
 } else {
     // ログイン済みのとき
     $user = $_SESSION['user']; ?>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">U r a t t e i</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="./index.php">トップページ</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./user-info.php">プロフィール</a>
-                </li>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./login/logout.php" tabindex="-1">ログアウト</a>
-                </li>
-            </ul>
-            <form class="d-flex">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">U r a t t e i</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="./index.php">トップページ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./user-info.php">プロフィール</a>
+                        </li>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./login/logout.php" tabindex="-1">ログアウト</a>
+                        </li>
+                    </ul>
+                    <form class="d-flex">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
 
-        </div>
-    </div>
-</nav>
-<?php 
+                </div>
+            </div>
+        </nav>
+        <?php
+        try {
+            // 通常の一覧表示か、検索結果かを保存するフラグ
+            $isSearch = false;
 
-try {
-    // 通常の一覧表示か、検索結果かを保存するフラグ
-    $isSearch = false;
+            $base = Base::getInstance();
+            $db = new postitems($base);
 
-    $base = Base::getInstance();
-    $db = new postitems($base);
+            // 検索キーワード
+            $search = "";
 
-    // 検索キーワード
-    $search = "";
-
-    if (isset($_GET['search'])) {
-        // GETに項目があるときは、検索
-        $get = Common::sanitaize($_GET);
-        $search = $get['search'];
-        $isSearch = true;
-        $items = $db->getPostedItemBySearch($search);
-    } else {
-        // GETに項目がないときは、作業項目を全件取得
-        $items = $db->getPostedItemAll();
-    }
-} catch (Exception $e) {
-    var_dump($e);
-    exit;
-}
-
-// ワンタイムトークンの生成
-$token = Common::generateToken();
-
-}?>
-
-    <body>
-
-        <?php if (isset($_SESSION['login'])) : ?>
-            <?php try {
-                $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
-                $dbh = new PDO($dsn, 'root', 'root');
-                $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $sql = 'select * from posts order by posted desc';
-                $stmt = $dbh->prepare($sql);
-                $stmt->execute();
-                $list = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } catch (Exception $e) {
-                var_dump($e);
-                exit;
+            if (isset($_GET['search'])) {
+                // GETに項目があるときは、検索
+                $get = Common::sanitaize($_GET);
+                $search = $get['search'];
+                $isSearch = true;
+                $items = $db->getPostedItemBySearch($search);
+            } else {
+                // GETに項目がないときは、作業項目を全件取得
+                $items = $db->getPostedItemAll();
             }
+        } catch (Exception $e) {
+            var_dump($e);
+            exit;
+        }
 
-            ?>
-            <?php try {
-                $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
-                $dbh = new PDO($dsn, 'root', 'root');
-                $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $sql = 'select * from users';
-                $stmt = $dbh->prepare($sql);
-                $stmt->execute();
-                $lists = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } catch (Exception $e) {
-                var_dump($e);
-                exit;
-            }
+        // ワンタイムトークンの生成
+        $token = Common::generateToken();
 
-            ?>
+        ?>
+
+        <body>
+
             <section class="conX">
                 <div class="container-1">
                     <?php if (isset($_SESSION['msg']['err'])) : ?>
                         <div class="alert alert-danger alert-dismissible fade show">
-                            <?= $_SESSION['msg']['err'] ?>
-                            <?php unset($_SESSION['msg']['err']); ?>
+                            <?= $_SESSION['msg']['error'] ?>
+                            <?php unset($_SESSION['msg']['error']); ?>
                         </div>
                     <?php endif ?>
                     <form method="post" action="./post.php">
@@ -199,35 +170,7 @@ $token = Common::generateToken();
                                         <p class="card-text"><?= $v['text'] ?></p>
                                         <p class="card-text"><small class="text-muted"><?= $v['posted'] ?></small></p>
                                         <form action="./post.php" method="post">
-                                            <?php
-                                            $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
-                                            $dbh = new PDO($dsn, 'root', 'root');
-                                            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                            $sql = 'select likes from posts where id=:id';
-                                            $stmt = $dbh->prepare($sql);
-                                            $stmt->bindValue(':id', $k['id'], PDO::PARAM_INT);
-                                            $stmt->execute();
-                                            $listx = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                            foreach ($listx as $f) {
-                                                echo $f['likes'];
-                                                var_dump($f);
-                                            }
-                                            ?>
                                             <button type="submit" name="likes" class="btn btn-danger">いいね</button>
-                                            <?php
-                                            $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
-                                            $dbh = new PDO($dsn, 'root', 'root');
-                                            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                                            $sql = 'select dislikes from posts where id=:id';
-                                            $stmt = $dbh->prepare($sql);
-                                            $stmt->bindValue(':id', $k['id'], PDO::PARAM_INT);
-                                            $stmt->execute();
-                                            $listx = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                            foreach ($listx as $g) {
-                                                echo $g['dislikes'];
-                                                var_dump($g);
-                                            }
-                                            ?>
                                             <button type="submit" name="dislikes" class="btn btn-primary">よくないね</button>
                                             <input type="hidden" name="id" value="<?= $v['id'] ?>">
                                         </form>
@@ -238,15 +181,15 @@ $token = Common::generateToken();
                     </section>
                 <?php endforeach ?>
             <?php endforeach ?>
-            <section class="conA">
+        <?php } ?>
 
-            </section>
+        <section class="conA">
 
-        <?php endif ?>
+        </section>
         <footer>
             <div class="footC">
             </div>
         </footer>
-    </body>
+        </body>
 
 </html>

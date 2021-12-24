@@ -1,15 +1,20 @@
+
 <?php
-session_start();
-$_SESSION=array();
-if(isset($_COOKIE[session_name()])==true){
-    setcookie(session_name(),'',time()-42000,'/');
-}
-session_destroy();
 
-session_start();
-session_regenerate_id();
+// 設定ファイルを読み込む。
+require_once('../../App/config.php');
+
+// ログインユーザー情報を削除して、ログアウト処理とする
+unset($_SESSION['user']);
+
+// 念のためにセッションに保存した他の情報も削除する
+unset($_SESSION['post']);
+unset($_SESSION['msg']);
+
+// ログインページへリダイレクト
 $_SESSION['msg']['err'] = 'ログアウトしました';
+header('Location: ./');
+exit;
 
-header('Location: ../');
 ?>
 

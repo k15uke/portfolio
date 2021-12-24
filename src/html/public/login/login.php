@@ -1,7 +1,9 @@
 <?php
-session_start();
-session_regenerate_id(true);
 
+require_once('../../App/config.php');
+use App\Util\Common;
+
+$token = Common::generateToken();
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +15,7 @@ session_regenerate_id(true);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../skin.css">
+    <link rel="stylesheet" href="../css/skin.css">
     <title>Urattei</title>
 </head>
 
@@ -58,18 +60,19 @@ session_regenerate_id(true);
     </nav>
     <section class="conA">
         <div class="container">
-            <?php if (isset($_SESSION['msg']['err'])) : ?>
+            <?php if (isset($_SESSION['msg']['error'])) : ?>
                 <div class="alert alert-danger alert-dismissible fade show">
-                    <?= $_SESSION['msg']['err'] ?>
-                    <?php unset($_SESSION['msg']['err']); ?>
+                    <?= $_SESSION['msg']['error'] ?>
+                    <?php unset($_SESSION['msg']['error']); ?>
                 </div>
             <?php endif ?>
             <h1>ログイン</h1>
             <form method="post" action="../login/login_check.php">
+                <input type="hidden" name="token" value="<?= $token ?>">
                 <p class="left">メールアドレス</p>
-                <input type="text" name="email" style="width:400px;">
+                <input type="text" id="email" name="email" style="width:400px;" value="<?= isset($_SESSION['post']['user']) ? $_SESSION['post']['user'] : '' ?>">
                 <p class="left2">パスワード</p>
-                <input type="text" name="pass" style="width:400px;">
+                <input type="password" id="password" name="pass" style="width:400px;">
                 <br><br>
                 <button type="button" onclick="location.href='../urattei/index.php'" class="btn btn-dark">戻る</button>
                 <button type="submit" class="btn btn-dark">ログイン</button>
