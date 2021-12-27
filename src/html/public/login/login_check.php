@@ -15,7 +15,7 @@ $post = Common::sanitaize($_POST);
 if (!isset($post['token']) || !Common::isValidToken($post['token'])) {
     // エラーメッセージをセッションに保存して、リダイレクトする
     $_SESSION['msg']['error']  = '不正な処理が行われました。';
-    header('Location: ../urattei/index.php');
+    header('Location: ./login.php');
     exit;
 }
 
@@ -48,10 +48,11 @@ try {
         unset($_SESSION['post']);
 
         // 作業一覧ページを表示
-        header('Location:./urattei/index.php');
+        header('Location: ./urattei/index.php');
         exit;
     }
 } catch (Exception $e) {
-    header('Location: ../error/error.php');
+    $_SESSION['msg']['error'] = $e;
+    header('Location: ../index.php');
     exit;
 }

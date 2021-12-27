@@ -60,7 +60,7 @@ $token = Common::generateToken();
     </nav>
     <section class="conA">
         <div class="container">
-            <?php if (isset($_SESSION['msg']['error'])) : ?>
+            <?php if (!empty($_SESSION['msg']['error'])) : ?>
                 <div class="alert alert-danger alert-dismissible fade show">
                     <?= $_SESSION['msg']['error'] ?>
                     <?php unset($_SESSION['msg']['error']); ?>

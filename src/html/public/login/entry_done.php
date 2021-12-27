@@ -1,47 +1,38 @@
 <?php
-session_start();
-session_regenerate_id(true);
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-<?php
-        try{
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $pass = $_POST['pass'];
-            $dsn = 'mysql:dbname=urattei;host=localhost;charset=utf8';
-            $user = 'root';
-            $password='root';
-           
-            $dbh = new PDO($dsn,$user,$password);
-            $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+require_once('../../App/Model/users.php');
+require_once('../../App/Model/Base.php');
+require_once('../../App/config.php');
+require_once('../../App/Util/Common.php');
+require_once('../../App/Util/SaftyUtil.php');
 
-            $sql = 'INSERT INTO users(name,email,pass) VALUES(?,?,?)';
-            $stmt = $dbh->prepare($sql);
-            $data[] = $name;
-            $data[] = $email;
-            $data[] = $pass;
-            $stmt->execute($data);
-            
-            $_SESSION['msg']['err'] = $name. 'さんを追加しました';
-            header('Location: ./login.php');
-            exit;
+// ワンタイムトークンのチェック
+if (!SaftyUtil::isValidToken($_POST['token'])) {
+    // エラーメッセージをセッションに保存して、リダイレクトする
+    $_SESSION['msg']['erorr']  = Config::MSG_INVALID_PROCESS;
+    header('Location: ./user_add.php');
+    exit;
+}
 
-        }catch(Exception $e){
-            var_dump($e);
-            exit();
-        }
+$_SESSION['login'] = $_POST;
 
-        ?>
+try{
+    $db = new Users();
 
-        <a href="staff_list.php">戻る</a>
-</body>
-</html>
+    $ret = $db->addUser($_POST['email'],$_POST['password'],$_POST['name']);
+    if(!$ret){
+        $_SESSION['msg']['error'] = 'すでに同じメールアドレスが登録されています。';
+        header('Location: ./entry.php');
+        exit;
+    }
+
+    unset($_SESSION['login']);
+    unset($_SESSION['error']);
+    $_SESSION['msg']['error'] = "登録が完了しました。";
+    header('Location: ./login.php');
+    exit;
+}catch (Exception $e){
+    $_SESSION['msg']['error'] = $e ;
+    header('Location: ./entry.php');
+    exit;
+}

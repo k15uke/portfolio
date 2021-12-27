@@ -21,12 +21,6 @@ use App\Util\Common;
 use App\Model\Base;
 use App\Model\postitems;
 
-// セッションに保存されたPOSTデータを削除（念の為）
-unset($_SESSION['post']);
-
-// 保存されているエラーメッセージを削除（念の為）
-unset($_SESSION['msg']['error']);
-
 if (empty($_SESSION['user'])) {      // 未ログインのとき    
 ?>
 
@@ -155,9 +149,6 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                     </form>
                 </div>
             </section>
-
-            <?php foreach ($list as $v) : ?>
-                <?php foreach ($lists as $k) : ?>
                     <section class="conX">
                         <div class="card bg-dark" style="min-width: 200px;">
                             <div class="row g-3">
@@ -166,9 +157,9 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                                 </div>
                                 <div class="col-md-8">
                                     <div class="card-body">
-                                        <h5 class="card-title"><?= $k['name'] ?>さん</h5>
-                                        <p class="card-text"><?= $v['text'] ?></p>
-                                        <p class="card-text"><small class="text-muted"><?= $v['posted'] ?></small></p>
+                                        <h5 class="card-title">aさん</h5>
+                                        <p class="card-text">aaaa</p>
+                                        <p class="card-text"><small class="text-muted">2021-1-1 11:11</small></p>
                                         <form action="./post.php" method="post">
                                             <button type="submit" name="likes" class="btn btn-danger">いいね</button>
                                             <button type="submit" name="dislikes" class="btn btn-primary">よくないね</button>
@@ -179,10 +170,7 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                             </div>
                         </div>
                     </section>
-                <?php endforeach ?>
-            <?php endforeach ?>
-        <?php } ?>
-
+<?php } ?>
         <section class="conA">
 
         </section>

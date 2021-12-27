@@ -1051,15 +1051,16 @@ header {
 	margin-left : -15rem;
 }
 
-.left2{
-	margin-left : -18rem;
-}
 
 .left3{
 	text-align: center;
 	margin-left : -10rem;
 }
 
+.left2{
+	text-align: right;
+	margin-left : -15rem;
+}
 
 .card-body{
 	background-color: black;

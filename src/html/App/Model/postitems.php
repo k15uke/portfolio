@@ -5,7 +5,7 @@ namespace App\Model;
 /**
  * 作業項目モデルクラスです。
  */
-class postitems
+class postItems extends Base
 {
     /** @var \PDO $pdo PDOクラスインスタンス */
     private $pdo;
@@ -78,7 +78,7 @@ class postitems
         $likeWord = "%$search%";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $likeWord, \PDO::PARAM_STR);
+        $stmt->bindParam(':id', $likeWord, \PDO::PARAM_INT);
         $stmt->bindParam(':text', $likeWord, \PDO::PARAM_STR);
         //$stmt->bindParam(':text', $search, \PDO::PARAM_STR);
         $stmt->execute();
@@ -187,6 +187,44 @@ class postitems
         return $ret;
     }
 
+        /**
+     * 指定IDの1件の作業項目を完了にします。
+     *
+     * @param int $id 作業項目ID
+     * @param string $date 完了日（NULLの場合は今日の日付）
+     * @return bool 成功した場合:TRUE、失敗した場合:FALSE
+     */
+    public function makeTodoItemComplete($id, $date = null) {
+        // $idが数字でなかったら、falseを返却する。
+        if (!is_numeric($id)) {
+            return false;
+        }
+
+        // $idが0以下はありえないので、falseを返却
+        if ($id <= 0) {
+            return false;
+        }
+
+        // $dateがnullだったら、今日の日付を設定する。
+        // date()については、
+        // https://www.php.net/manual/ja/function.date.php
+        // を参照
+        if (is_null($date)) {
+            $date = date('Y-m-d');
+        }
+
+        $sql = '';
+        $sql .= 'update todo_items set ';
+        $sql .= 'finished_date=:finished_date ';
+        $sql .= 'where id=:id';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':finished_date', $date, \PDO::PARAM_STR);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        $ret = $stmt->execute();
+
+        return $ret;
+    }
     
     /**
      * 指定IDの1件の作業項目を論理削除します。

@@ -20,12 +20,23 @@ class Users extends Base
         // 引数に指定されたPDOクラスのインスタンスをプロパティに代入します。
         // クラスのインスタンスは別の変数に代入されても同じものとして扱われます。（複製されるわけではありません）
         $this->pdo = $pdo;
+
     }
 
     /**
-     * すべてのユーザーの情報を取得します。
+     * すべてのユーザーの
+     * 情報を取得します。
      *
      * @return array ユーザーのレコードの配列
+     */
+
+         /**
+     * 新規ユーザー追加
+     *
+     * @param string $email
+     * @param string $password
+     * @param string $name
+     * @return bool
      */
     public function getUserAll()
     {
@@ -51,13 +62,14 @@ class Users extends Base
      * ユーザーを検索して、ユーザーの情報を取得します。
      *
      * @param string $user ユーザー名
-     * @param striong $password パスワード
+     * @param string $password パスワード
      * @return array ユーザー情報の配列（該当のユーザーが見つからないときは空の配列）
      */
-    public function getUser($user, $password)
+
+    public function getUser(string $email, string $password) : array
     {
         // $userが空だったら、空の配列を返却
-        if (empty($user)) {
+        if (empty($email)) {
             return array();
         }
 
@@ -129,44 +141,48 @@ class Users extends Base
         return true;
     }
 
-    public function addUser(string $email ,string $password ,string $name): bool{
-        if(!empty($this->findUserByEmail($email))){
+
+    /**
+     * 新規ユーザー追加
+     *
+     * @param string $email
+     * @param string $password
+     * @param string $name
+     * @return bool
+     */
+
+    public function addUser(string $email, string $password, string $name): bool
+    {
+        // 同じメールアドレスのユーザーがいないか調べる
+        if (!empty($this->findUserByEmail($email))) {
+            // 同じメールアドレスのユーザーが存在したらfalseを返却
             return false;
         }
-        
-        $password = password_hash($password,PASSWORD_DEFAULT);
 
+        // パスワードをハッシュ化する
+        $password = password_hash($password, PASSWORD_DEFAULT);
+
+        // レコードをインサートする
         $sql = 'insert into users (email, password, name)';
         $sql .= ' values ';
         $sql .= '(:email, :password, :name)';
 
         $stmt = $this->dbh->prepare($sql);
-        $stmt->bindValue(':email',$email,PDO::PARAM_STR);
-        $stmt->bindValue(':password',$password,PDO::PARAM_STR);
-        $stmt->bindValue(':name',$name,PDO::PARAM_STR);
+        $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
+        $stmt->bindValue(':password', $password,\PDO::PARAM_STR);
+        $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
         $stmt->execute();
 
+        // 処理が終了したらtrueを返却
         return true;
-    }
-
-    public function getUser(string $email, string $password):array{
-        $rec = $this->findUserByEmail($email);
-        if(empty($rec)){
-            return [];
-        }
-
-        if(password_verify($password,$rec['password'])){
-            return $rec;
-        }
-        return [];
     }
 
     private function findUserByEmail(string $email):array{
         $sql = 'select * from users where email=:email';
         $stmt = $this->dbh->prepare($sql);
-        $stmt->bindValue(':email',$email,PDO::PARAM_STR);
+        $stmt->bindValue(':email',$email,\PDO::PARAM_STR);
         $stmt->execute();
-        $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+        $rec = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if(empty($rec)){
             return[];

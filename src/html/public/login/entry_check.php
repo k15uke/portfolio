@@ -1,6 +1,22 @@
 <?php
-session_start();
-session_regenerate_id(true);
+
+require_once('../../App/Model/Base.php');
+require_once('../../App/Model/Users.php');
+require_once('../../App/config.php');
+require_once('../../App/Util/Common.php');
+require_once('../../App/Util/SaftyUtil.php');
+
+
+if (!SaftyUtil::isValidToken($_POST['token'])) {
+    // エラーメッセージをセッションに保存して、リダイレクトする
+    $_SESSION['msg']['error']  = Config::MSG_INVALID_PROCESS;
+    header('Location: ./entry.php');
+    exit;
+}
+
+// ログインの情報をセッションに保存する
+$_SESSION['login'] = $_POST;
+
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +28,7 @@ session_regenerate_id(true);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../skin.css">
+    <link rel="stylesheet" href="../css/skin.css">
     <title>Urattei</title>
 </head>
 
@@ -57,10 +73,10 @@ session_regenerate_id(true);
     </nav>
     <section class="conA">
         <div class="container">
-            <?php if (isset($_SESSION['msg']['err'])) : ?>
+            <?php if (isset($_SESSION['msg']['error'])) : ?>
                 <div class="card-body">
-                    <?= $_SESSION['msg']['err'] ?>
-                    <?php unset($_SESSION['msg']['err']) ?>
+                    <?= $_SESSION['msg']['error'] ?>
+                    <?php unset($_SESSION['msg']['error']) ?>
                 </div>
             <?php endif ?>
             <h1>入力確認</h1>
@@ -73,16 +89,20 @@ session_regenerate_id(true);
 
 
             if ($name == '') {
-                $_SESSION['msg']['err'] = '名前が入力されていません';
+                $_SESSION['msg']['error'] = '名前が入力されていません';
                 header('Location: ./entry.php');
             }
 
             if ($pass == '') {
-                $_SESSION['msg']['err'] = 'パスワードが入力されていません';
+                $_SESSION['msg']['error'] = 'パスワードが入力されていません';
+                header('Location: ./entry.php');
+
             }
 
             if ($pass != $pass2) {
-                $_SESSION['msg']['err'] = 'パスワードが一致しません。';
+                $_SESSION['msg']['error'] = 'パスワードが一致しません。';
+                header('Location: ./entry.php');
+
             }
 
             if ($name == '' || $pass == '' || $pass != $pass2) {
@@ -90,13 +110,12 @@ session_regenerate_id(true);
                 print '<input type="button" onclick="history.back()" value="戻る">';
                 print '</form>';
             } else {
-                $pass = md5($pass);
             ?>
-
                 <form method="post" action="entry_done.php">
                     <input type="hidden" name="email" value=<?= $email ?>>
                     <input type="hidden" name="pass" value=<?= $pass ?>>
                     <input type="hidden" name="name" value=<?= $name ?>>
+                    <input type="hidden" name="token" value="<?= SaftyUtil::generateToken() ?>">
                     <br>
                     <h2>名前：<br>「<?= $name ?>」さん</h2>
                     <br>
@@ -107,8 +126,6 @@ session_regenerate_id(true);
                     <button type="button" onclick="history.back()" class="btn btn-dark">戻る</button>
                     <button type="submit" class="btn btn-dark">登録</button>
                 </form>
-
-
             <?php } ?>
         </div>
     </section>

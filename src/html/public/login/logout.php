@@ -12,7 +12,7 @@ unset($_SESSION['post']);
 unset($_SESSION['msg']);
 
 // ログインページへリダイレクト
-$_SESSION['msg']['err'] = 'ログアウトしました';
+$_SESSION['msg']['error'] = 'ログアウトしました';
 header('Location: ./');
 exit;
 

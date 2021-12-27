@@ -1,6 +1,15 @@
 <?php
-session_start();
-session_regenerate_id(true);
+// 設定ファイルを読みこむ。
+require_once('../../App/Model/Base.php');
+require_once('../../App/Model/Users.php');
+require_once('../../App/config.php');
+require_once('../../App/Util/Common.php');
+require_once('../../App/Util/SaftyUtil.php');
+
+// クラスを読み込む。
+use App\Util\Common;
+use App\Model\Base;
+use App\Model\Users;
 
 ?>
 
@@ -13,7 +22,7 @@ session_regenerate_id(true);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../skin.css">
+    <link rel="stylesheet" href="../css/skin.css">
     <title>Urattei</title>
 </head>
 
@@ -58,19 +67,20 @@ session_regenerate_id(true);
     </nav>
     <section class="conA">
         <div class="container">
-            <?php if (isset($_SESSION['msg']['err'])) : ?>
+            <?php if (isset($_SESSION['msg']['error'])) : ?>
                 <div class=" alert alert-danger alert-dismissible fade show">
-                    <?= $_SESSION['msg']['err'] ?>
-                    <?php unset($_SESSION['msg']['err']); ?>
+                    <?= $_SESSION['msg']['error'] ?>
+                    <?php unset($_SESSION['msg']['error']); ?>
                 </div>
             <?php endif ?>
             <h1>会員登録</h1>
             <form method="post" action="./entry_check.php">
+                <input type="hidden" name="token" value="<?= SaftyUtil::generateToken() ?>">
                 <p class="left">ニックネーム</p>
                 <input type="text" name="name" style="width:400px;">
                 <p class="left">メールアドレス</p>
                 <input type="text" name="email" style="width:400px;">
-                <p class="left2">パスワード</p>
+                <p style="margin-left:-4rem;">パスワード(8文字以上の英数字)</p>
                 <input type="password" name="pass" style="width:400px;">
                 <p class="left3">パスワードをもう一度</p>
                 <input type="password" name="pass2" style="width:400px;">
@@ -81,8 +91,6 @@ session_regenerate_id(true);
             </form>
         </div>
     </section>
-
-
 
     </section>
 
