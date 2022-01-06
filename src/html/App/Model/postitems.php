@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use Exception;
+
 /**
  * 作業項目モデルクラスです。
  */
@@ -15,7 +17,8 @@ class postItems extends Base
      *
      * @param \PDO $pdo \PDOクラスインスタンス
      */
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         // 引数に指定されたPDOクラスのインスタンスをプロパティに代入します。
         // クラスのインスタンスは別の変数に代入されても同じものとして扱われます。（複製されるわけではありません）
         $this->pdo = $pdo;
@@ -26,7 +29,8 @@ class postItems extends Base
      *
      * @return array 作業項目の配列
      */
-    public function getPostedItemAll() {
+    public function getPostedItemAll()
+    {
         $sql = '';
         $sql .= 'select ';
         $sql .= 'posts.id,';
@@ -39,8 +43,11 @@ class postItems extends Base
         $sql .= 'posts.text ';
         $sql .= 'from urattei.posts ';
         $sql .= 'inner join users on posts.user_id = users.user_id ';
-                // 論理削除されている作業項目は表示対象外
-        $sql .= 'order by posted desc';   // 期限日の順番に並べる
+        $sql .= 'where posts.is_deleted=0 ';
+
+        // 論理削除されている作業項目は表示対象外
+        $sql .= 'order by posted desc ';   // 期限日の順番に並べる
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         $ret = $stmt->fetchAll();
@@ -54,31 +61,32 @@ class postItems extends Base
      * @param mixed $search 検索キーワード
      * @return array 作業項目の配列
      */
-    public function getPostedItemBySearch($search) {
+    public function getPostedItemBySearch($search)
+    {
         $sql = '';
         $sql .= 'select ';
-        $sql .= 'p.id,';
-        $sql .= 'p.user_id,';
-        $sql .= 'p.text,';
-        $sql .= 'p.likes,';
-        $sql .= 'p.dislikes,';
-        $sql .= 'p.posted,';
-        $sql .= 'p.photo ';
-        $sql .= 'from urattei p ';
-        $sql .= 'inner join users u on p.user_id=u.id ';
-        $sql .= 'where p.is_deleted=0 ';    // 論理削除されている作業項目は表示対象外
+        $sql .= 'posts.id,';
+        $sql .= 'posts.user_id,';
+        $sql .= 'posts.name,';
+        $sql .= 'posts.likes,';
+        $sql .= 'posts.dislikes,';
+        $sql .= 'posts.posted,';
+        $sql .= 'posts.photo,';
+        $sql .= 'posts.text ';
+        $sql .= 'from urattei.posts ';
+        $sql .= 'inner join users on posts.user_id = users.user_id ';
+        // 論理削除されている作業項目は表示対象外
         $sql .= "and (";
-        $sql .= "p.text like :text ";
-        $sql .= "or u.id like :id ";
+        $sql .= "posts.text like :text";
         $sql .= ") ";
-        $sql .= 'order by p.expire_date asc';
+        $sql .= 'order by posted desc';   // 期限日の順番に並べる
 
         // bindParam()の第2引数には値を直接入れることができないので
         // 下記のようにして、検索ワードを変数に入れる。
         $likeWord = "%$search%";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':id', $likeWord, \PDO::PARAM_INT);
+        // $stmt->bindParam(':id', $likeWord, \PDO::PARAM_INT);
         $stmt->bindParam(':text', $likeWord, \PDO::PARAM_STR);
         //$stmt->bindParam(':text', $search, \PDO::PARAM_STR);
         $stmt->execute();
@@ -92,7 +100,8 @@ class postItems extends Base
      * @param int $id 作業項目のID番号
      * @return array 作業項目の配列
      */
-    public function getPostedItemById($id) {
+    public function getPostedItemById($id)
+    {
         // $idが数字でなかったら、falseを返却する。
         if (!is_numeric($id)) {
             return false;
@@ -128,10 +137,11 @@ class postItems extends Base
      * @param array $data 作業項目の連想配列
      * @return bool 成功した場合:TRUE、失敗した場合:FALSE
      */
-    public function registerPostItem($data) {
+    public function registerPostItem($data)
+    {
         // テーブルの構造でデフォルト値が設定されているカラムをinsert文で指定する必要はありません（特に理由がない限り）。
-       
-        
+
+
         $sql = '';
         $sql .= 'insert into posts (';
         $sql .= 'user_id,';
@@ -153,9 +163,10 @@ class postItems extends Base
         return $ret;
     }
 
-    public function registerPostItemWithPhoto($data) {
+    public function registerPostItemWithPhoto($data)
+    {
         // テーブルの構造でデフォルト値が設定されているカラムをinsert文で指定する必要はありません（特に理由がない限り）。
-       
+
         $sql = '';
         $sql .= 'insert into posts (';
         $sql .= 'user_id,';
@@ -188,7 +199,8 @@ class postItems extends Base
      * @param array $data 更新する作業項目の連想配列
      * @return bool 成功した場合:TRUE、失敗した場合:FALSE
      */
-    public function updatePostedById($data) {
+    public function updatePostedById($data)
+    {
         // $data['id']が存在しなかったら、falseを返却
         if (!isset($data['id'])) {
             return false;
@@ -222,14 +234,15 @@ class postItems extends Base
         return $ret;
     }
 
-        /**
+    /**
      * 指定IDの1件の作業項目を完了にします。
      *
      * @param int $id 作業項目ID
      * @param string $date 完了日（NULLの場合は今日の日付）
      * @return bool 成功した場合:TRUE、失敗した場合:FALSE
      */
-    public function makeTodoItemComplete($id, $date = null) {
+    public function makeTodoItemComplete($id, $date = null)
+    {
         // $idが数字でなかったら、falseを返却する。
         if (!is_numeric($id)) {
             return false;
@@ -260,14 +273,15 @@ class postItems extends Base
 
         return $ret;
     }
-    
+
     /**
      * 指定IDの1件の作業項目を論理削除します。
      *
      * @param int $id 作業項目ID
      * @return bool 成功した場合:TRUE、失敗した場合:FALSE
      */
-    public function deletePostedById($id) {
+    public function deletePostedById($id)
+    {
         // $idが数字でなかったら、falseを返却する。
         if (!is_numeric($id)) {
             return false;
@@ -290,90 +304,328 @@ class postItems extends Base
         return $ret;
     }
 
-    public function like(int $id){
-        try{
+    public function deletePostedById2(int $id, int $user_id)
+    {
+        // $idが数字でなかったら、falseを返却する。
+        if (!is_numeric($id)) {
+            return false;
+        }
+
+        // $idが0以下はありえないので、falseを返却
+        if ($id <= 0) {
+            return false;
+        }
+
+        try {
+
+            $sql = '';
+            $sql .= 'select p.user_id,';
+            $sql .= 'p.id,';
+            $sql .= 'u.user_id ';
+            $sql .= 'from posts p ';
+            $sql .= 'inner join users u ';
+            $sql .= 'on p.user_id = u.user_id ';
+            $sql .= 'where p.id=:id and u.user_id=:user_id';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, \PDO::PARAM_INT);
+
+            $stmt->execute();
+            $ret2 = $stmt->fetch();
+
+            if($ret2['user_id'] = $_SESSION['user']['user_id']){
+                $sql = '';
+                $sql .= 'update posts set ';
+                $sql .= 'is_deleted=1 ';
+                $sql .= 'where id=:id';
+    
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+    
+                $ret = $stmt->execute();
+            } else{
+                $_SESSION['msg']['error'] = 'あなたの投稿ではないので、削除できませんでした';
+                header('Location: ./');
+                exit();
+            }
+
+            $_SESSION['msg']['error'] = '削除しました';
+            header('Location: ./index.php');
+            exit;
+        } catch (Exception $e) {
+            var_dump($e);
+            exit;
+            $_SESSION['msg']['error'] = '削除できませんでした';
+        }
+    }
+
+    public function like(int $id)
+    {
+        try {
+            $sql = '';
+            $sql .= 'select likes from posts ';
+            $sql .= 'where id=:id';
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
+            $ret = $stmt->fetch();
+            $likes = $ret['likes'];
+            if ($likes == 0) {
+                $likes++;
+            } else {
+                $_SESSION['msg']['error'] = '既にいいねしています。';
+                header('Location: ./index.php');
+                exit;
+            }
+
+            $sql = '';
+            $sql .= 'update posts set ';
+            $sql .= 'likes=:likes ';
+            $sql .= 'where id=:id';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':likes', $likes, \PDO::PARAM_INT);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+
+            $ret = $stmt->execute();
+
+            $_SESSION['msg']['error'] = 'いいねしました';
+            header('Location: ./index.php');
+            exit;
+        } catch (Exception $e) {
+            $_SESSION['msg']['error'] = 'いいねできませんでした';
+            exit();
+        }
+    }
+
+    public function like2(int $id, int $user_id)
+    {
+        try {
+
 
             $sql = '';
             $sql .= 'select likes from posts ';
             $sql .= 'where id=:id';
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-            $stmt->execute(); 
+            $stmt->execute();
             $ret = $stmt->fetch();
             $likes = $ret['likes'];
-            $likes++;
+
+
+            $sql = '';
+            $sql .= 'select p.user_id,';
+            $sql .= 'p.likes,';
+            $sql .= 'l.user_id ';
+            $sql .= 'from posts p ';
+            $sql .= 'inner join users u ';
+            $sql .= 'on p.user_id = u.user_id ';
+            $sql .= 'inner join likedislike l ';
+            $sql .= 'on p.user_id = l.user_id ';
+            $sql .= 'where p.id=:id';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
+            $ret2 = $stmt->fetch();
+
+            // var_dump($ret2['user_id']);
+            //var_dump($_SESSION['user']['user_id']);
+            //var_dump($ret2['likes']);
+            // exit;
+
+            if ($ret2['user_id'] == $_SESSION['user']['user_id'] && $ret2['likes'] == 0) {
+                $likes++;
+            } else {
+                $likes--;
+            }
 
             $sql = '';
             $sql .= 'update posts set ';
             $sql .= 'likes=:likes ';
             $sql .= 'where id=:id';
-    
+
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':likes', $likes, \PDO::PARAM_INT);
             $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
 
             $ret = $stmt->execute();
-            
+
+            $sql = '';
+            $sql .= 'insert into likedislike (';
+            $sql .= 'post_id,';
+            $sql .= 'user_id,';
+            $sql .= 'likes';
+            $sql .= ') values (';
+            $sql .= ':post_id,';
+            $sql .= ':user_id,';
+            $sql .= ':likes';
+            $sql .= ')';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':post_id', $id, \PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, \PDO::PARAM_STR);
+            $stmt->bindParam(':likes', $likes, \PDO::PARAM_STR);
+
+            $ret = $stmt->execute();
+
             $_SESSION['msg']['error'] = 'いいねしました';
             header('Location: ./index.php');
             exit;
-
-        }catch(Exception $e){
+        } catch (Exception $e) {
             $_SESSION['msg']['error'] = 'いいねできませんでした';
             exit();
         }
     }
 
-    public function like2(int $id,int $user_id){
 
-
-            $sql = '';
-            $sql .= 'select * from posts ';
-            $sql .= 'where id=:id  AND user_id = :user_id';
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-            $stmt->bindParam(':user_id', $user_id, \PDO::PARAM_INT);
-            $stmt->execute(); 
-            $favorite = $stmt->fetch();
-
-            return $favorite;
-    }
-
-    public function dislike2(int $id,int $user_id){
-        
-    }
-
-    public function dislike(int $id){
-        try{
+    public function dislike(int $id)
+    {
+        try {
             $sql = '';
             $sql .= 'select dislikes from posts ';
             $sql .= 'where id=:id';
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-            $stmt->execute(); 
+            $stmt->execute();
             $ret = $stmt->fetch();
             $dislikes = $ret['dislikes'];
-            $dislikes++;
+            if ($dislikes == 0) {
+                $dislikes++;
+            } else {
+                $dislikes--;
+            }
 
             $sql = '';
             $sql .= 'update posts set ';
             $sql .= 'dislikes=:dislikes ';
             $sql .= 'where id=:id';
-    
+
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':dislikes', $dislikes, \PDO::PARAM_INT);
             $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
 
             $ret = $stmt->execute();
-            
+
             $_SESSION['msg']['error'] = 'よくないねしました';
             header('Location: ./index.php');
             exit;
-
-        }catch(Exception $e){
+        } catch (Exception $e) {
             $_SESSION['msg']['error'] = 'よくないねできませんでした';
             exit();
         }
     }
 
+    public function dislike2(int $id, int $user_id)
+    {
+        try {
+
+
+            $sql = '';
+            $sql .= 'select dislikes from posts ';
+            $sql .= 'where id=:id';
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
+            $ret = $stmt->fetch();
+            $dislikes = $ret['dislikes'];
+
+
+            $sql = '';
+            $sql .= 'select p.user_id,';
+            $sql .= 'p.dislikes,';
+            $sql .= 'l.user_id ';
+            $sql .= 'from posts p ';
+            $sql .= 'inner join users u ';
+            $sql .= 'on p.user_id = u.user_id ';
+            $sql .= 'inner join likedislike l ';
+            $sql .= 'on p.user_id = l.user_id ';
+            $sql .= 'where p.id=:id';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+            $stmt->execute();
+            $ret2 = $stmt->fetch();
+
+            // var_dump($ret2['user_id']);
+            //var_dump($_SESSION['user']['user_id']);
+            //var_dump($ret2['likes']);
+            // exit;
+
+            if ($ret2['user_id'] == $_SESSION['user']['user_id'] && $ret2['dislikes'] == 0) {
+                $dislikes++;
+            } else {
+                $dislikes--;
+            }
+
+            $sql = '';
+            $sql .= 'update posts set ';
+            $sql .= 'dislikes=:dislikes ';
+            $sql .= 'where id=:id';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':likes', $dislikes, \PDO::PARAM_INT);
+            $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+
+            $ret = $stmt->execute();
+
+            $sql = '';
+            $sql .= 'insert into likedislike (';
+            $sql .= 'post_id,';
+            $sql .= 'user_id,';
+            $sql .= 'dislikes';
+            $sql .= ') values (';
+            $sql .= ':post_id,';
+            $sql .= ':user_id,';
+            $sql .= ':dislikes';
+            $sql .= ')';
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindParam(':post_id', $id, \PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, \PDO::PARAM_STR);
+            $stmt->bindParam(':dislikes', $likes, \PDO::PARAM_STR);
+
+            $ret = $stmt->execute();
+
+            $_SESSION['msg']['error'] = 'よくないねしました';
+            header('Location: ./index.php');
+            exit;
+        } catch (Exception $e) {
+            $_SESSION['msg']['error'] = 'よくないねできませんでした';
+            exit();
+        }
+    }
+
+
+
+
+    public function getUserInfo(int $user_id)
+    {
+        // $idが数字でなかったら、falseを返却する。
+        if (!is_numeric($user_id)) {
+            return false;
+        }
+
+        // $idが0以下はありえないので、falseを返却
+        if ($user_id <= 0) {
+            return false;
+        }
+
+        $sql = '';
+        $sql .= 'select ';
+        $sql .= 'user_id,';
+        $sql .= 'name,';
+        $sql .= 'email,';
+        $sql .= 'create_date ';
+        $sql .= 'from users ';
+        $sql .= 'where user_id=:user_id ';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':user_id', $user_id, \PDO::PARAM_INT);
+        $stmt->execute();
+        $ret = $stmt->fetch();
+
+        return $ret;
+    }
 }

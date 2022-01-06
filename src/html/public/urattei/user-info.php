@@ -14,25 +14,27 @@ if (!empty($_SESSION['user'])) {
     $user = $_SESSION['user'];
 }
 
+
 if (isset($user)) {
     try {
         // 通常の一覧表示か、検索結果かを保存するフラグ
         $isSearch = false;
+
         $base = Base::getInstance();
         $db = new postItems($base);
 
         // 検索キーワード
-     //   $search = "";
+        $search = "";
 
         if (isset($_GET['search'])) {
             // GETに項目があるときは、検索
-           $get = Common::sanitaize($_GET);
+            $get = Common::sanitaize($_GET);
             $search = $get['search'];
             $isSearch = true;
             $items = $db->getpostedItemBySearch($search);
-        }   else {
+        } else {
             // GETに項目がないときは、作業項目を全件取得
-            $items = $db->getpostedItemAll();
+            $items = $db->getUserInfo($_SESSION['user']['user_id']);
         }
     } catch (Exception $e) {
         $_SESSION['msg']['error'] = $e;
@@ -40,8 +42,6 @@ if (isset($user)) {
 
     // ワンタイムトークンの生成
     $token = Common::generateToken();
-
-
 }
 ?>
 
@@ -82,9 +82,8 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                             <a class="nav-link active" aria-current="page" href="../login/entry.php">会員登録</a>
                         </li>
                     </ul>
-                    <form class="d-flex" method="get" name="search" action="./post.php" >
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"  placeholder="Search" name="search" value="<?= $search ?>">
-                        <input type="hidden" name="token" value="<?= $token ?>">
+                    <form class="d-flex">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
                 </div>
@@ -133,8 +132,8 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                             <a class="nav-link" href="../login/logout.php" tabindex="-1">ログアウト</a>
                         </li>
                     </ul>
-                    <form class="d-flex" id="search" method="get" action="index.php">
-                        <input class="form-control me-2" name="search" type="text" placeholder="Search" aria-label="Search">
+                    <form class="d-flex">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
 
@@ -158,48 +157,27 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                             </div>
                         </section>
                     <?php endif ?>
-                    <form method="post" action="./post.php" enctype="multipart/form-data">
-                        <div class="container2">
-                            <textarea name="text" style="width:500px; height:60px;background-color:black;color:white;"></textarea>
-                            <br>
-                        </div>
-                        <div class="d-flex gap-2 justify-content-end">
-                            <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
-                            <input type="hidden" name="name" value="<?= $user['name'] ?>">
-                            <input type="hidden" name="token" value="<?= $token ?>">
-                            <input type="file" name="image_file" value="image_file" id="image_file" class="form-control-file">
-                            <button class="btn btn-dark" name="upload" type="submit">投稿</button>
-                        </div>
-                    </form>
+                  
                 </div>
             </section>
-            <section class="conX">
-                <?php foreach ($items as $v) : ?>
-                    <div class="card bg-dark" style="min-width: 400px;">
-                        <div class="row g-1">
+            <section class="conX">>
+            <div class="container2">
+                    <div class="card bg-dark" style="min-width: 200px;">
+                        <div class="row g-3">
                             <div class="col-md-4">
-                                <img src="./images/<?= $v['photo'] ?>" class="card-img-top" style="width:100%; height:100%">
+                                <img src="./images/0" class="card-img-top" style="width:100%; height:100%">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <h5 class="card-title"><?= $v['name'] ?>さん</h5>
-                                    <p class="card-text"><?= $v['text'] ?></p>
-                                    <p class="card-text"><small class="text-muted"><?= $v['posted'] ?></small></p>
-                                    <form action="./post.php" method="post">
-                                        <input type="hidden" name="id" value="<?= $v['id'] ?>">
-                                        <input type="hidden" name="token" value="<?= $token ?>">
-                                        <?= $v['likes'] ?>
-                                        <button name="like" id="like" class="btn btn-danger">いいね</button>
-                                        <?= $v['dislikes'] ?>
-                                        <button name="dislike" id="dislike" class="btn btn-primary">よくないね</button>
-                                        <button name="delete" id="delete" class="btn btn-dark">削除</button>
-                                    </form>
+                                    <h5 class="card-title">User ID : <?= $items['user_id'] ?> <br> <?= $items['name'] ?>さん</h5>
+                                    <p class="card-text">Email  : <?= $items['email'] ?></p>
+                                    <p class="card-text"><small class="text-muted"><?= $items['create_date'] ?>　にアカウント作成</small></p>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    </div>
             </section>
-        <?php endforeach ?>
     <?php } ?>
     <section class="conA">
 

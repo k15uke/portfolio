@@ -85,7 +85,7 @@ use App\Model\Users;
                 <p class="left3">パスワードをもう一度</p>
                 <input type="password" name="password2" style="width:400px;">
                 <br><br>
-                <button type="button" onclick="location.href='../index.php'" class="btn btn-dark">戻る</button>
+                <button type="button" onclick="location.href='../../public/urattei/index.php'" class="btn btn-dark">戻る</button>
                 <button type="submit" class="btn btn-dark">登録する</button>
 
             </form>
