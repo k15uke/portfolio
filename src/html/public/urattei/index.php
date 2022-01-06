@@ -1,3 +1,50 @@
+<?php
+
+require_once('../../App/config.php');
+
+use App\Util\Common;
+use App\Model\Base;
+use App\Model\postItems;
+
+// セッションに保存されたPOSTデータを削除（念の為）
+unset($_SESSION['post']);
+
+if (!empty($_SESSION['user'])) {
+    // ログイン済みのとき
+    $user = $_SESSION['user'];
+}
+
+if (isset($user)) {
+    try {
+        // 通常の一覧表示か、検索結果かを保存するフラグ
+        $isSearch = false;
+
+        $base = Base::getInstance();
+        $db = new postItems($base);
+
+        // 検索キーワード
+        $search = "";
+
+        if (isset($_GET['search'])) {
+            // GETに項目があるときは、検索
+            $get = Common::sanitaize($_GET);
+            $search = $get['search'];
+            $isSearch = true;
+            $items = $db->getpostedItemBySearch($search);
+        } else {
+            // GETに項目がないときは、作業項目を全件取得
+            $items = $db->getpostedItemAll();
+        }
+    } catch (Exception $e) {
+        $_SESSION['msg']['error'] = $e;
+    }
+
+    // ワンタイムトークンの生成
+    $token = Common::generateToken();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,12 +61,6 @@
 <?php
 
 // 設定ファイルを読み込む。
-require_once('../../App/config.php');
-
-// クラスを読み込む
-use App\Util\Common;
-use App\Model\Base;
-use App\Model\postitems;
 
 if (empty($_SESSION['user'])) {      // 未ログインのとき    
 ?>
@@ -49,10 +90,10 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
         </nav>
         <section class="conA">
             <div class="container">
-                <?php if (isset($_SESSION['msg']['err'])) : ?>
+                <?php if (isset($_SESSION['msg']['error'])) : ?>
                     <div class="alert alert-danger alert-dismissible fade show">
-                        <?= $_SESSION['msg']['err'] ?>
-                        <?php unset($_SESSION['msg']['err']); ?>
+                        <?= $_SESSION['msg']['error'] ?>
+                        <?php unset($_SESSION['msg']['error']); ?>
                     </div>
                 <?php endif ?>
                 <h1>Urattei</h1>
@@ -80,11 +121,14 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                             <a class="nav-link active" aria-current="page" href="./index.php">トップページ</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="./user-info.php">プロフィール</a>
+                            <form method="post" action="./user-info.php">
+                                <input type="hidden" value="<?= $token ?>">
+                                <a class="nav-link" href="./user-info.php">プロフィール</a>
+                            </form>
                         </li>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="./login/logout.php" tabindex="-1">ログアウト</a>
+                            <a class="nav-link" href="../login/logout.php" tabindex="-1">ログアウト</a>
                         </li>
                     </ul>
                     <form class="d-flex">
@@ -96,88 +140,72 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
             </div>
         </nav>
         <?php
-        try {
-            // 通常の一覧表示か、検索結果かを保存するフラグ
-            $isSearch = false;
-
-            $base = Base::getInstance();
-            $db = new postitems($base);
-
-            // 検索キーワード
-            $search = "";
-
-            if (isset($_GET['search'])) {
-                // GETに項目があるときは、検索
-                $get = Common::sanitaize($_GET);
-                $search = $get['search'];
-                $isSearch = true;
-                $items = $db->getPostedItemBySearch($search);
-            } else {
-                // GETに項目がないときは、作業項目を全件取得
-                $items = $db->getPostedItemAll();
-            }
-        } catch (Exception $e) {
-            var_dump($e);
-            exit;
-        }
-
         // ワンタイムトークンの生成
         $token = Common::generateToken();
 
         ?>
 
         <body>
-
             <section class="conX">
                 <div class="container-1">
-                    <?php if (isset($_SESSION['msg']['err'])) : ?>
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            <?= $_SESSION['msg']['error'] ?>
-                            <?php unset($_SESSION['msg']['error']); ?>
-                        </div>
+                    <?php if (isset($_SESSION['msg']['error'])) : ?>
+                        <section class="conB">
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <?= $_SESSION['msg']['error'] ?>
+                                <?php unset($_SESSION['msg']['error']); ?>
+                            </div>
+                        </section>
                     <?php endif ?>
-                    <form method="post" action="./post.php">
+                    <form method="post" action="./post.php" enctype="multipart/form-data">
                         <div class="container2">
                             <textarea name="text" style="width:500px; height:60px;background-color:black;color:white;"></textarea>
                             <br>
                         </div>
-
                         <div class="d-flex gap-2 justify-content-end">
-                            <button class="btn btn-dark" type="submit" name="photo">画像を添付</button>
-                            <button class="btn btn-dark" type="submit" name="text">投稿</button>
+                            <input type="hidden" name="user_id" value="<?= $user['user_id'] ?>">
+                            <input type="hidden" name="name" value="<?= $user['name'] ?>">
+                            <input type="hidden" name="token" value="<?= $token ?>">
+                            <input type="file" name="image_file" value="image_file" id="image_file" class="form-control-file">
+                            <button class="btn btn-dark" name="upload" type="submit">投稿</button>
                         </div>
                     </form>
                 </div>
             </section>
-                    <section class="conX">
-                        <div class="card bg-dark" style="min-width: 200px;">
-                            <div class="row g-3">
-                                <div class="col-md-4">
-                                    <img src="./img/top.jpg" class="card-img-top" style="width:19vh; height:17vh">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">aさん</h5>
-                                        <p class="card-text">aaaa</p>
-                                        <p class="card-text"><small class="text-muted">2021-1-1 11:11</small></p>
-                                        <form action="./post.php" method="post">
-                                            <button type="submit" name="likes" class="btn btn-danger">いいね</button>
-                                            <button type="submit" name="dislikes" class="btn btn-primary">よくないね</button>
-                                            <input type="hidden" name="id" value="<?= $v['id'] ?>">
-                                        </form>
-                                    </div>
+            <section class="conX">
+                <?php foreach ($items as $v) : ?>
+                    <div class="card bg-dark" style="min-width: 200px;">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <img src="./images/<?= $v['photo'] ?>" class="card-img-top" style="width:100%; height:100%">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= $v['name'] ?>さん</h5>
+                                    <p class="card-text"><?= $v['text'] ?></p>
+                                    <p class="card-text"><small class="text-muted"><?= $v['posted'] ?></small></p>
+                                    <form action="./post.php" method="post">
+                                        <input type="hidden" name="id" value="<?= $v['id'] ?>">
+                                        <input type="hidden" name="token" value="<?= $token ?>">
+                                        <?= $v['likes'] ?>
+                                        <button name="like" id="like" class="btn btn-danger">いいね</button>
+                                        <?= $v['dislikes'] ?>
+                                        <button name="dislike" id="dislike" class="btn btn-primary">よくないね</button>
+                                    </form>
+
                                 </div>
                             </div>
                         </div>
-                    </section>
-<?php } ?>
-        <section class="conA">
+                    </div>
+            </section>
+        <?php endforeach ?>
+    <?php } ?>
+    <section class="conA">
 
-        </section>
-        <footer>
-            <div class="footC">
-            </div>
-        </footer>
+    </section>
+    <footer>
+        <div class="footC">
+        </div>
+    </footer>
         </body>
 
 </html>

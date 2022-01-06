@@ -13,7 +13,7 @@ unset($_SESSION['msg']);
 
 // ログインページへリダイレクト
 $_SESSION['msg']['error'] = 'ログアウトしました';
-header('Location: ./');
+header('Location: ../urattei/index.php');
 exit;
 
 ?>

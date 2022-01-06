@@ -81,9 +81,9 @@ use App\Model\Users;
                 <p class="left">メールアドレス</p>
                 <input type="text" name="email" style="width:400px;">
                 <p style="margin-left:-4rem;">パスワード(8文字以上の英数字)</p>
-                <input type="password" name="pass" style="width:400px;">
+                <input type="password" name="password" style="width:400px;">
                 <p class="left3">パスワードをもう一度</p>
-                <input type="password" name="pass2" style="width:400px;">
+                <input type="password" name="password2" style="width:400px;">
                 <br><br>
                 <button type="button" onclick="location.href='../index.php'" class="btn btn-dark">戻る</button>
                 <button type="submit" class="btn btn-dark">登録する</button>

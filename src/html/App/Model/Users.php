@@ -75,17 +75,18 @@ class Users extends Base
 
         $sql = '';
         $sql .= 'select ';
-        $sql .= 'id,';
+        $sql .= 'user_id,';
         $sql .= 'name,';
         $sql .= 'email,';
-        $sql .= 'pass,';
-        $sql .= 'create_date ';
+        $sql .= 'password,';
+        $sql .= 'create_date, ';
+        $sql .= 'posts ';
         $sql .= 'from users ';
-        $sql .= 'where is_deleted=0 ';  // 論理削除されているユーザーはログイン対象外
-        $sql .= 'and user=:user';
+        //$sql .= 'where is_deleted=0 ';  // 論理削除されているユーザーはログイン対象外
+        $sql .= 'where email=:email';
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(':user', $user, \PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email, \PDO::PARAM_STR);
         $stmt->execute();
 
         $rec = $stmt->fetch();
@@ -99,7 +100,7 @@ class Users extends Base
         // password_verify()については、
         // https://www.php.net/manual/ja/function.password-verify.php
         // 参照。
-        if (!password_verify($password, $rec['pass'])) {
+        if (!password_verify($password, $rec['password'])) {
             return array();
         }
 
@@ -167,7 +168,7 @@ class Users extends Base
         $sql .= ' values ';
         $sql .= '(:email, :password, :name)';
 
-        $stmt = $this->dbh->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
         $stmt->bindValue(':password', $password,\PDO::PARAM_STR);
         $stmt->bindValue(':name', $name, \PDO::PARAM_STR);
@@ -179,7 +180,7 @@ class Users extends Base
 
     private function findUserByEmail(string $email):array{
         $sql = 'select * from users where email=:email';
-        $stmt = $this->dbh->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':email',$email,\PDO::PARAM_STR);
         $stmt->execute();
         $rec = $stmt->fetch(\PDO::FETCH_ASSOC);

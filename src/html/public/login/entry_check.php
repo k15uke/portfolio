@@ -84,8 +84,8 @@ $_SESSION['login'] = $_POST;
 
             $name = $_POST['name'];
             $email = $_POST['email'];
-            $pass = $_POST['pass'];
-            $pass2 = $_POST['pass2'];
+            $password = $_POST['password'];
+            $password2 = $_POST['password2'];
 
 
             if ($name == '') {
@@ -93,28 +93,28 @@ $_SESSION['login'] = $_POST;
                 header('Location: ./entry.php');
             }
 
-            if ($pass == '') {
+            if ($password == '') {
                 $_SESSION['msg']['error'] = 'パスワードが入力されていません';
                 header('Location: ./entry.php');
 
             }
 
-            if ($pass != $pass2) {
+            if ($password != $password2) {
                 $_SESSION['msg']['error'] = 'パスワードが一致しません。';
                 header('Location: ./entry.php');
 
             }
 
-            if ($name == '' || $pass == '' || $pass != $pass2) {
+            if ($name == '' || $password == '' || $password != $password2) {
                 print '<form>';
                 print '<input type="button" onclick="history.back()" value="戻る">';
                 print '</form>';
             } else {
             ?>
                 <form method="post" action="entry_done.php">
-                    <input type="hidden" name="email" value=<?= $email ?>>
-                    <input type="hidden" name="pass" value=<?= $pass ?>>
-                    <input type="hidden" name="name" value=<?= $name ?>>
+                    <input type="hidden" name="email" value="<?= $email ?>">
+                    <input type="hidden" name="password" value="<?= $password ?>">
+                    <input type="hidden" name="name" value="<?= $name ?>">
                     <input type="hidden" name="token" value="<?= SaftyUtil::generateToken() ?>">
                     <br>
                     <h2>名前：<br>「<?= $name ?>」さん</h2>

@@ -1,10 +1,16 @@
 <?php
 
-require_once('../../App/Model/users.php');
-require_once('../../App/Model/Base.php');
+//require_once('../../App/Model/Users.php');
+//require_once('../../App/Model/Base.php');
 require_once('../../App/config.php');
-require_once('../../App/Util/Common.php');
+//require_once('../../App/Util/Common.php');
 require_once('../../App/Util/SaftyUtil.php');
+
+use App\Model\Base;
+use App\Model\Users;
+use App\Util\Common;
+
+
 
 // ワンタイムトークンのチェック
 if (!SaftyUtil::isValidToken($_POST['token'])) {
@@ -17,7 +23,10 @@ if (!SaftyUtil::isValidToken($_POST['token'])) {
 $_SESSION['login'] = $_POST;
 
 try{
-    $db = new Users();
+    $base = new Base();
+    //$db = new Users($base->getInstance());
+
+    $db = new Users($base->getInstance());
 
     $ret = $db->addUser($_POST['email'],$_POST['password'],$_POST['name']);
     if(!$ret){

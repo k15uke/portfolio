@@ -1,6 +1,11 @@
 <?php
 
+require_once('../../App/Model/Base.php');
+require_once('../../App/Model/Users.php');
 require_once('../../App/config.php');
+require_once('../../App/Util/Common.php');
+require_once('../../App/Util/SaftyUtil.php');
+
 use App\Util\Common;
 
 $token = Common::generateToken();
@@ -72,7 +77,7 @@ $token = Common::generateToken();
                 <p class="left">メールアドレス</p>
                 <input type="text" id="email" name="email" style="width:400px;" value="<?= isset($_SESSION['post']['user']) ? $_SESSION['post']['user'] : '' ?>">
                 <p class="left2">パスワード</p>
-                <input type="password" id="password" name="pass" style="width:400px;">
+                <input type="password" id="password" name="password" style="width:400px;">
                 <br><br>
                 <button type="button" onclick="location.href='../urattei/index.php'" class="btn btn-dark">戻る</button>
                 <button type="submit" class="btn btn-dark">ログイン</button>

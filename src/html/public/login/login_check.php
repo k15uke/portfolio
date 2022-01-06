@@ -1,7 +1,11 @@
 <?php
 
 // 設定ファイルを読み込む。
+require_once('../../App/Model/Base.php');
+require_once('../../App/Model/Users.php');
 require_once('../../App/config.php');
+require_once('../../App/Util/Common.php');
+require_once('../../App/Util/SaftyUtil.php');
 
 // クラスを読み込む。
 use App\Util\Common;
@@ -23,7 +27,7 @@ try {
     // ユーザーの検索、ユーザー情報の取得
     $base = Base::getInstance();
     $db = new Users($base);
-    $user = $db->getUser($post['user'], $post['password']);
+    $user = $db->getUser($post['email'], $post['password']);
 
     if (empty($user)) {
         // ユーザーの情報が取得できなかったとき
@@ -48,11 +52,11 @@ try {
         unset($_SESSION['post']);
 
         // 作業一覧ページを表示
-        header('Location: ./urattei/index.php');
+        header('Location: ../urattei/index.php');
         exit;
     }
 } catch (Exception $e) {
     $_SESSION['msg']['error'] = $e;
-    header('Location: ../index.php');
+    header('Location: ./login.php');
     exit;
 }
