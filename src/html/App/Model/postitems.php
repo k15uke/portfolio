@@ -161,6 +161,27 @@ class postItems extends Base
 
         $ret = $stmt->execute();
 
+        $sql = 'select posts from users ';
+        $sql .= 'where user_id=:user_id';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':user_id', $data['user_id'], \PDO::PARAM_INT);
+        $stmt->execute();
+        $ret2 = $stmt->fetchAll();
+
+        $ret2['posts']++;
+
+        $sql = '';
+        $sql .= 'update users  set  ';
+        $sql .= 'posts=:posts ';
+        $sql .= 'where user_id=:user_id';
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->bindParam(':user_id', $data['user_id'], \PDO::PARAM_INT);
+        $stmt->bindParam(':posts', $ret2['posts'], \PDO::PARAM_INT);
+        $stmt->execute();
+        $ret = $stmt->fetch();
+        $likes = $ret['likes'];
+
         return $ret;
     }
 
@@ -335,7 +356,9 @@ class postItems extends Base
             $stmt->execute();
             $ret2 = $stmt->fetch();
 
-            if ($ret2['user_id'] = $_SESSION['user']['user_id']) {
+
+
+            if ($ret2['user_id'] && $_SESSION['user']['user_id'] == $_SESSION['user']['user_id']) {
                 $sql = '';
                 $sql .= 'update posts set ';
                 $sql .= 'is_deleted=1 ';
@@ -403,8 +426,6 @@ class postItems extends Base
     public function like2(int $id, int $user_id)
     {
         try {
-
-
             $sql = '';
             $sql .= 'select likes from posts ';
             $sql .= 'where id=:id';
@@ -431,12 +452,7 @@ class postItems extends Base
             $stmt->execute();
             $ret2 = $stmt->fetch();
 
-            // var_dump($ret2['user_id']);
-            //var_dump($_SESSION['user']['user_id']);
-            //var_dump($ret2['likes']);
-            // exit;
-
-            if ($ret2['user_id'] == $_SESSION['user']['user_id'] && $ret2['likes'] == 0) {
+            if ($ret2['user_id'] && $_SESSION['user']['user_id'] && $ret2['likes'] == 0) {
                 $likes++;
             } else {
                 $likes--;
@@ -521,8 +537,6 @@ class postItems extends Base
     public function dislike2(int $id, int $user_id)
     {
         try {
-
-
             $sql = '';
             $sql .= 'select dislikes from posts ';
             $sql .= 'where id=:id';
@@ -531,7 +545,6 @@ class postItems extends Base
             $stmt->execute();
             $ret = $stmt->fetch();
             $dislikes = $ret['dislikes'];
-
 
             $sql = '';
             $sql .= 'select p.user_id,';
@@ -549,12 +562,7 @@ class postItems extends Base
             $stmt->execute();
             $ret2 = $stmt->fetch();
 
-            // var_dump($ret2['user_id']);
-            //var_dump($_SESSION['user']['user_id']);
-            //var_dump($ret2['likes']);
-            // exit;
-
-            if ($ret2['user_id'] == $_SESSION['user']['user_id'] && $ret2['dislikes'] == 0) {
+            if ($ret2['user_id'] && $_SESSION['user']['user_id'] && $ret2['dislikes'] == 0) {
                 $dislikes++;
             } else {
                 $dislikes--;
@@ -566,7 +574,7 @@ class postItems extends Base
             $sql .= 'where id=:id';
 
             $stmt = $this->pdo->prepare($sql);
-            $stmt->bindParam(':likes', $dislikes, \PDO::PARAM_INT);
+            $stmt->bindParam(':dislikes', $dislikes, \PDO::PARAM_INT);
             $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
 
             $ret = $stmt->execute();
@@ -618,7 +626,8 @@ class postItems extends Base
         $sql .= 'user_id,';
         $sql .= 'name,';
         $sql .= 'email,';
-        $sql .= 'create_date ';
+        $sql .= 'create_date,';
+        $sql .= 'posts ';
         $sql .= 'from users ';
         $sql .= 'where user_id=:user_id ';
 

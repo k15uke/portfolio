@@ -62,14 +62,8 @@ $token = Common::generateToken();
                 <br><br>
                 <button type="button" onclick="location.href='../urattei/index.php'" class="btn btn-dark">戻る</button>
                 <button type="submit" class="btn btn-dark">ログイン</button>
-
             </form>
         </div>
-    </section>
-
-
-
-    </section>
 
     <section class="conD">
     </section>
@@ -77,6 +71,7 @@ $token = Common::generateToken();
         <div class="footC">
         </div>
     </footer>
+            </section>
 </body>
 
 

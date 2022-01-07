@@ -171,6 +171,7 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                                 <div class="card-body">
                                     <h5 class="card-title">User ID : <?= $items['user_id'] ?> <br> <?= $items['name'] ?>さん</h5>
                                     <p class="card-text">Email  : <?= $items['email'] ?></p>
+                                    <p class="card-text">投稿件数  : <?= $items['posts'] ?></p>
                                     <p class="card-text"><small class="text-muted"><?= $items['create_date'] ?>　にアカウント作成</small></p>
                                 </div>
                             </div>

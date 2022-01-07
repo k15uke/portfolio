@@ -97,7 +97,8 @@ if (!isset($post['token']) || !Common::isValidToken($post['token'])) {
             $base = Base::getInstance();
             $db = new postItems($base);
             $id = $post['id'];
-            $db->dislike($id);
+            $user_id = $_SESSION['user']['user_id'];
+            $db->dislike2($id,$user_id);
             header('Location: ./');
             exit;
         }
@@ -119,12 +120,21 @@ if (!isset($post['token']) || !Common::isValidToken($post['token'])) {
             header('Location: ./index.php');
             exit;
         } elseif (mb_strlen($post['text']  < 500)) {
-            $data = array(
-                'id' => $_SESSION['reply'],
-                'user_id' => $post['user_id'],
-                'text' => $post['text'],
-                'name' => $post['name'],
-            );
+            if(isset($_SESSION['reply'])){
+                $data = array(
+                    'id' => $_SESSION['reply'],
+                    'user_id' => $post['user_id'],
+                    'text' => $post['text'],
+                    'name' => $post['name'],
+                );
+            }else{
+                $data = array(
+                    'user_id' => $post['user_id'],
+                    'text' => $post['text'],
+                    'name' => $post['name'],
+                );
+            }
+
 
             try {
                 if (isset($_SESSION['reply'])) {
