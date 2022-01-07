@@ -48,10 +48,8 @@ body {
 	align-items: center;
 	justify-content: center;
 	background-color:black;
-	height: 100vh;
-	min-height: 450px;
-	background-position: center;
-	background-size: cover;
+	height: 30vh;
+	min-height: 30px;
 	color: #fff;
 	color: var(--text-bright-color);
 	text-align: center;
@@ -113,7 +111,8 @@ body {
 	background-position: center;
 	background-size: cover;
 	color: #fff;
-	height : 10vh;
+	min-height : 30vh;
+	min-width:80vw;
 	color: var(--text-bright-color);
 	text-align: center;}
 .conB .text {
@@ -122,13 +121,13 @@ body {
 
 .conB h2 {
 	margin-top: 0;
-	margin-bottom: 10px;
+	margin-bottom: 0px;
 	font-size: 20px;
 }
 
 .conB p {
 	margin-top: 0;
-	margin-bottom: 20px;
+	margin-bottom: 0px;
 	font-size: 14px;
 	line-height: 1.8;
 	opacity: 0.8;
@@ -146,7 +145,6 @@ body {
 
 .conB .icon {
 	display: inline-block;
-	margin-bottom: 20px;
 	font-size: 40px;
 	width: 2em;
 	line-height: 2em;
@@ -173,8 +171,6 @@ body {
 }
 
 .conB .container {
-	padding-top: 80px;
-	padding-bottom: 20px;
 	text-align: left;
 }
 
@@ -1051,15 +1047,13 @@ header {
 	margin-left : -15rem;
 }
 
+.left2{
+	margin-left : -15rem;
+}
 
 .left3{
 	text-align: center;
 	margin-left : -10rem;
-}
-
-.left2{
-	text-align: right;
-	margin-left : 0rem;
 }
 
 .card-body{
@@ -1077,12 +1071,12 @@ header {
 }
 
 .conX{
-	display: flex;
+	display:flex;
 	align-items: center;
 	justify-content: center;
 	background-color:black;
-	height: 10vh;
-	min-height: 200px;
+	height: 15vh;
+	min-height: 15vh;
 	background-position: center;
 	background-size: cover;
 	color: #fff;
@@ -1095,4 +1089,8 @@ header {
 
 .con1{
 	width: 50%;
+}
+
+.conA container-1{
+	height:200px;
 }

@@ -40,7 +40,8 @@ class postItems extends Base
         $sql .= 'posts.dislikes,';
         $sql .= 'posts.posted,';
         $sql .= 'posts.photo,';
-        $sql .= 'posts.text ';
+        $sql .= 'posts.text,';
+        $sql .= 'posts.reply ';
         $sql .= 'from urattei.posts ';
         $sql .= 'inner join users on posts.user_id = users.user_id ';
         $sql .= 'where posts.is_deleted=0 ';
@@ -334,17 +335,17 @@ class postItems extends Base
             $stmt->execute();
             $ret2 = $stmt->fetch();
 
-            if($ret2['user_id'] = $_SESSION['user']['user_id']){
+            if ($ret2['user_id'] = $_SESSION['user']['user_id']) {
                 $sql = '';
                 $sql .= 'update posts set ';
                 $sql .= 'is_deleted=1 ';
                 $sql .= 'where id=:id';
-    
+
                 $stmt = $this->pdo->prepare($sql);
                 $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
-    
+
                 $ret = $stmt->execute();
-            } else{
+            } else {
                 $_SESSION['msg']['error'] = 'あなたの投稿ではないので、削除できませんでした';
                 header('Location: ./');
                 exit();
@@ -628,4 +629,60 @@ class postItems extends Base
 
         return $ret;
     }
+
+
+    public function reply($data)
+    {
+            try {
+
+
+                $sql = '';
+                $sql .= 'insert into posts (';
+                $sql .= 'user_id,';
+                $sql .= 'text,';
+                $sql .= 'name';
+                $sql .= ') values (';
+                $sql .= ':user_id,';
+                $sql .= ':text,';
+                $sql .= ':name';
+                $sql .= ')';
+        
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->bindParam(':user_id', $data['user_id'], \PDO::PARAM_INT);
+                $stmt->bindParam(':text', $data['text'], \PDO::PARAM_STR);
+                $stmt->bindParam(':name', $data['name'], \PDO::PARAM_STR);
+        
+                $ret = $stmt->execute();
+
+                $sql = '';
+                $sql .= 'select reply from posts ';
+                $sql .= 'where id=:id';
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->bindParam(':id', $data['id'], \PDO::PARAM_INT);
+                $stmt->execute();
+                $ret = $stmt->fetch();
+                $reply = $ret['reply'];
+                $reply++;
+
+                $sql = '';
+                $sql .= 'update posts set ';
+                $sql .= 'reply=:reply ';
+                $sql .= 'where id=:id';
+    
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->bindParam(':reply', $reply, \PDO::PARAM_INT);
+                $stmt->bindParam(':id', $data['id'], \PDO::PARAM_INT);
+    
+                $ret = $stmt->execute();
+    
+                $_SESSION['msg']['error'] = '返信しました。';
+                unset($_SESSION['reply']);
+                header('Location: ./index.php');
+                exit;
+            } catch (Exception $e) {
+                var_dump($e);
+                $_SESSION['msg']['error'] = '返信できませんでした。';
+                exit();
+            }
+        }
 }

@@ -53,9 +53,9 @@ if (isset($user)) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/skin.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../css/skin.css">
     <title>Urattei</title>
 </head>
 
@@ -82,11 +82,7 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                             <a class="nav-link active" aria-current="page" href="../login/entry.php">会員登録</a>
                         </li>
                     </ul>
-                    <form class="d-flex" method="get" name="search" action="./post.php" >
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"  placeholder="Search" name="search" value="<?= $search ?>">
-                        <input type="hidden" name="token" value="<?= $token ?>">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
-                    </form>
+
                 </div>
             </div>
         </nav>
@@ -148,7 +144,7 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
         ?>
 
         <body>
-            <section class="conX">
+        <section class="conX">
                 <div class="container-1">
                     <?php if (isset($_SESSION['msg']['error'])) : ?>
                         <section class="conB">
@@ -160,7 +156,11 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                     <?php endif ?>
                     <form method="post" action="./post.php" enctype="multipart/form-data">
                         <div class="container2">
-                            <textarea name="text" style="width:500px; height:60px;background-color:black;color:white;"></textarea>
+                            <textarea name="text" style="width:500px; height:60px;background-color:black;color:white;">
+                        <?php if(isset($_SESSION['reply'])) : ?>
+                            >><?= $_SESSION['reply'] ?>
+                        <?php endif ?>
+                        </textarea>
                             <br>
                         </div>
                         <div class="d-flex gap-2 justify-content-end">
@@ -173,16 +173,16 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                     </form>
                 </div>
             </section>
-            <section class="conX">
+            <section class="conB">
                 <?php foreach ($items as $v) : ?>
-                    <div class="card bg-dark" style="min-width: 400px;">
+                    <div class="card bg-dark" >
                         <div class="row g-1">
                             <div class="col-md-4">
                                 <img src="./images/<?= $v['photo'] ?>" class="card-img-top" style="width:100%; height:100%">
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <h5 class="card-title"><?= $v['name'] ?>さん</h5>
+                                 <h5 class="card-title"><?= $v['id'] ?>.<?= $v['name'] ?>さん</h5>
                                     <p class="card-text"><?= $v['text'] ?></p>
                                     <p class="card-text"><small class="text-muted"><?= $v['posted'] ?></small></p>
                                     <form action="./post.php" method="post">
@@ -193,6 +193,8 @@ if (empty($_SESSION['user'])) {      // 未ログインのとき
                                         <?= $v['dislikes'] ?>
                                         <button name="dislike" id="dislike" class="btn btn-primary">よくないね</button>
                                         <button name="delete" id="delete" class="btn btn-dark">削除</button>
+                                        <?= $v['reply'] ?>
+                                        <button name="reply" id="reply" class="btn btn-info">返信</button>
                                     </form>
                                 </div>
                             </div>
